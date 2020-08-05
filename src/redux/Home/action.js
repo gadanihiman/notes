@@ -1,7 +1,12 @@
-import { LOAD_EXAMPLES_DATA, LOAD_EXAMPLES_DATA_SUCCESS, STORE_NOTES } from "./constant"
+import { LOAD_EXAMPLES_DATA, LOAD_EXAMPLES_DATA_SUCCESS, STORE_NOTES, SAVE_NOTES } from "./constant"
 
 export const storeNotes = payload => ({
   type: STORE_NOTES,
+  payload,
+})
+
+export const saveNotes = payload => ({
+  type: SAVE_NOTES,
   payload,
 })
 

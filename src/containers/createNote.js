@@ -7,36 +7,28 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { arrayOf, any, func } from "prop-types";
 import { v4 as uuidv4 } from 'uuid';
+import * as queryString from 'query-string';
+import { List } from 'immutable';
 
-import Layout from "../components/Layout/layout"
-import SEO from "../components/Layout/seo"
-import { storeNotes } from "../redux/Home/action";
-import { homeData } from "../redux/Home/selectors";
+import Layout from '../components/Layout/layout';
+import SEO from '../components/Layout/seo';
+import { storeNotes, saveNotes } from '../redux/Home/action';
+import { homeData } from '../redux/Home/selectors';
 
 const { Option } = Select;
 
-const CreateNote = ({ onStoreNote, notes }) => {
+const CreateNote = ({ onStoreNote, onSaveNote, notes, location }) => {
+  const noteFormatted = notes instanceof List ? notes.toJS() : notes;
+  const { id: noteID } = queryString.parse(location.search);
+  const notesToDisplay = noteFormatted && noteFormatted.find(note => note.id === noteID);
   const [isVisible, setVisible] = useState(false);
   const [position, setPosition] = useState('');
   const [color, setColor] = useState('');
   const [text, setText] = useState('');
-  const [tempNotes, setTempNotes] = useState([]);
+  const [tempNotes, setTempNotes] = useState(notesToDisplay || []);
   const handleColorChange = value => {
     setColor(value);
   };
-
-  // structure data
-  // [
-  //   {
-  //     id: 'asd',
-  //     notes: [
-  //       {
-  //         id: 'asd',
-  //         ...config,
-  //       }
-  //     ],
-  //   }
-  // ]
 
   const createTempNote = config => {
     const tempNoteToStore = tempNotes;
@@ -46,34 +38,63 @@ const CreateNote = ({ onStoreNote, notes }) => {
       dateCreated: new Date(),
       dateModified: new Date(),
     }
-    tempNoteToStore.push(noteConfig);
+    if (tempNoteToStore.notes) {
+      tempNoteToStore.notes.push(noteConfig);
+    } else {
+      tempNoteToStore.push(noteConfig);
+    }
     setTempNotes(tempNoteToStore);
     setVisible(false);
   };
   
-  const saveNotes = note => {
-    onStoreNote(note);
+  const submitNote = () => {
+    if (!noteID) {
+      return onStoreNote(tempNotes);
+    };
+    return onSaveNote(tempNotes)
   };
   
 
-  const noteFiltered = tempNotes && tempNotes.sort((a, b) => {
-    const positionA = +a.position;
-    const positionB = +b.position;
-  
-    if (positionA < positionB) {
-      return -1;
+  const noteFiltered = () => {
+    let notesToSort;
+    if (tempNotes.notes) {
+      notesToSort = tempNotes.notes
+    } else {
+      notesToSort = tempNotes
     }
-    if (positionA > positionB) {
-      return 1;
-    }
+    return notesToSort.sort((a, b) => {
+      const positionA = +a.position;
+      const positionB = +b.position;
+    
+      if (positionA < positionB) {
+        return -1;
+      }
+      if (positionA > positionB) {
+        return 1;
+      }
+    
+      // names must be equal
+      return 0;
+    });
+  }
+  // tempNotes && tempNotes.notes && tempNotes.notes.sort((a, b) => {
+  //   const positionA = +a.position;
+  //   const positionB = +b.position;
   
-    // names must be equal
-    return 0;
-  });
+  //   if (positionA < positionB) {
+  //     return -1;
+  //   }
+  //   if (positionA > positionB) {
+  //     return 1;
+  //   }
+  
+  //   // names must be equal
+  //   return 0;
+  // });
 
   const colorResolved = bgColor => {
     let fixColor;
-    switch (bgColor.toLowerCase()) {
+    switch (bgColor && bgColor.toLowerCase()) {
       case 'white':
         fixColor = 'black';
         break;
@@ -95,7 +116,7 @@ const CreateNote = ({ onStoreNote, notes }) => {
     <Layout>
       <SEO title="Create notes" />
       <h1>Notes</h1>
-      {noteFiltered && noteFiltered.map(note => (
+      {noteFiltered() && noteFiltered().map(note => (
         <div
           style={{
             fontWeight: 'bold',
@@ -178,9 +199,9 @@ const CreateNote = ({ onStoreNote, notes }) => {
           type="primary"
           size="large"
           block
-          onClick={() => saveNotes(tempNotes)}
+          onClick={() => submitNote()}
         >
-          Save
+          {!noteID ? 'Create' : 'Save'}
         </Button>
       </div>
     </Layout>
@@ -193,11 +214,13 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   onStoreNote: storeNotes,
+  onSaveNote: saveNotes,
 };
 
 CreateNote.propTypes = {
   notes: arrayOf(any),
   onStoreNote: func.isRequired,
+  onSaveNote: func.isRequired,
 };
 
 CreateNote.defaultProps = {

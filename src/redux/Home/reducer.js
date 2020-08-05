@@ -4,8 +4,8 @@ import {
   LOAD_EXAMPLES_DATA,
   LOAD_EXAMPLES_DATA_SUCCESS,
   LOAD_EXAMPLES_DATA_ERROR,
-  // NEW_NOTES_PARENT,
   STORE_NOTES,
+  SAVE_NOTES,
 } from "./constant"
 
 const initialState = fromJS({
@@ -17,16 +17,14 @@ const initialState = fromJS({
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    // case NEW_NOTES_PARENT: {
-    //   const notes = [ 
-    //     {
-    //       id: uuidv4(),
-    //       notes: [],
-    //     },
-    //    ];
-    //   // return state.set()
-    //   return state.set('noteConfig', notes);
-    // }
+    case SAVE_NOTES: {
+      const noteID = action.payload.id;
+      const newNotes = action.payload.notes;
+      const currentNotes = state.get('noteConfig');
+      const removeSelectedNote = currentNotes.filter((note => note.id !== noteID));
+      const updatedNotes = [ ...removeSelectedNote, { id: noteID, notes: newNotes } ];
+      return state.set('noteConfig', updatedNotes);
+    }
 
     case STORE_NOTES: {
       const notes = [
@@ -36,8 +34,6 @@ export default (state = initialState, action) => {
           notes: action.payload,
         },
       ];
-      // const notes = [ ...state.get('noteConfig'), action.payload ];
-      // return state.set()
       return state.set('noteConfig', notes);
     }
 

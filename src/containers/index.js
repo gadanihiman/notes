@@ -20,7 +20,7 @@ const IndexPage = ({ noteList }) => {
         {isEmpty(noteList) && <h2>Notes is empty ...</h2>}
         {noteList && noteList.map(({ id }) => (
           <div style={{ margin: 10 }}>
-            <Link to={`/notes/${id}`}>
+            <Link to={`/notes/?id=${id}`}>
               <Card />
             </Link>
           </div>

@@ -7,7 +7,7 @@ module.exports = [
   },
   {
     path: '/notes/:id',
-    component: path.resolve('src/containers/editNote.js'),
+    component: path.resolve('src/containers/createNote.js'),
   },
   {
     path: '/createNote',
