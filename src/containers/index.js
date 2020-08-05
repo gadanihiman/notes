@@ -78,7 +78,7 @@ const IndexPage = ({ noteList, onRemoveNote }) => {
         }}
         onClick={() => setRemovable(!removeable)}
       >
-        <span>Edit</span>
+        <span>{removeable ? 'Cancel' : 'Edit'}</span>
       </div>
     </Layout>
   )
