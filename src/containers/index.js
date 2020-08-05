@@ -1,10 +1,14 @@
 import React from "react"
 import { Link } from "gatsby"
 import { arrayOf, any } from "prop-types"
+import { isEmpty } from 'lodash'
+import { createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
 
 import Card from '../components/general/Card'
 import Layout from "../components/Layout/layout"
 import SEO from "../components/Layout/seo"
+import { homeData } from "../redux/Home/selectors";
 
 const IndexPage = ({ noteList }) => {
   return (
@@ -13,10 +17,13 @@ const IndexPage = ({ noteList }) => {
       <h1>Notes</h1>
 
       <div style={{ display: 'flex' }}>
-        {noteList.map(({ notesID }) => (
-          <Link to={`/notes/${notesID}`}>
-            <Card />
-          </Link>
+        {isEmpty(noteList) && <h2>Notes is empty ...</h2>}
+        {noteList && noteList.map(({ id }) => (
+          <div style={{ margin: 10 }}>
+            <Link to={`/notes/${id}`}>
+              <Card />
+            </Link>
+          </div>
         ))}
         <Link to="/createNote">
           <div
@@ -53,13 +60,17 @@ IndexPage.propTypes = {
 };
 
 IndexPage.defaultProps = {
-  noteList: [{
-    notesID: 1,
-    position: 1,
-    color: '',
-    datecreated: '',
-    dateModified: '',
-  }],
+  noteList: [],
 };
 
-export default IndexPage;
+const mapStateToProps = createStructuredSelector({
+  noteList: homeData('noteConfig'),
+});
+
+// const mapDispatchToProps = {
+//   onStoreNote: storeNotes,
+// };
+
+export default connect(
+  mapStateToProps,
+)(IndexPage);
