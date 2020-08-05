@@ -3,7 +3,7 @@ import { createSelector } from "reselect"
 
 const selectHome = (state) => state.home
 
-const selectExamplesData = (property = "examplesData") =>
+const homeData = (property = "examplesData") =>
   createSelector(selectHome, (homeState) => homeState.get(property))
 
-export { selectExamplesData }
+export { homeData }
