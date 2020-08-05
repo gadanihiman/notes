@@ -49,10 +49,10 @@ const CreateNote = ({ onStoreNote, onSaveNote, notes, location }) => {
   };
   
   const submitNote = () => {
+    navigate('/');
     if (!noteID) {
       return onStoreNote(tempNotes);
     };
-    navigate('/');
     return onSaveNote(tempNotes)
   };
   

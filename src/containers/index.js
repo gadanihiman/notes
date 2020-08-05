@@ -1,16 +1,26 @@
-import React from "react"
-import { Link } from "gatsby"
-import { arrayOf, any } from "prop-types"
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable no-undef */
+import React, { useState } from 'react'
+import { Link } from 'gatsby'
+import { arrayOf, any, func } from 'prop-types'
 import { isEmpty } from 'lodash'
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect'
+import { connect } from 'react-redux'
 
 import Card from '../components/general/Card'
-import Layout from "../components/Layout/layout"
-import SEO from "../components/Layout/seo"
-import { homeData } from "../redux/Home/selectors";
+import Layout from '../components/Layout/layout'
+import SEO from '../components/Layout/seo'
+import { homeData } from '../redux/Home/selectors'
+import { removeNote } from '../redux/Home/action'
 
-const IndexPage = ({ noteList }) => {
+const IndexPage = ({ noteList, onRemoveNote }) => {
+  const [removeable, setRemovable] = useState(false);
+  const removeAction = id => {
+    console.log('remove func')
+    onRemoveNote(id);
+  };
+
   return (
     <Layout>
       <SEO title="Home" />
@@ -20,6 +30,24 @@ const IndexPage = ({ noteList }) => {
         {isEmpty(noteList) && <h2>Notes is empty ...</h2>}
         {noteList && noteList.map(({ id }) => (
           <div key={id} style={{ margin: 10 }}>
+            {removeable &&
+              <div
+                style={{
+                  fontSize: '20px',
+                  background: 'white',
+                  cursor: 'pointer',
+                  position: 'absolute',
+                  top: '182px',
+                  left: '168px',
+                  textAlign: 'center',
+                  border: '1px solid black',
+                  borderRadius: '50px',
+                  width: '25px',
+                }}
+                onClick={() => removeAction(id)}
+              >
+                X
+              </div>}
             <Link to={`/notes/?id=${id}`}>
               <Card noteID={id} />
             </Link>
@@ -41,11 +69,14 @@ const IndexPage = ({ noteList }) => {
         </Link>
       </div>
 
-      <div style={{
+      <div
+        style={{
           marginTop: 100,
           textAlign: 'right',
           cursor: 'pointer',
+          fontSize: '16px'
         }}
+        onClick={() => setRemovable(!removeable)}
       >
         <span>Edit</span>
       </div>
@@ -55,6 +86,7 @@ const IndexPage = ({ noteList }) => {
 
 IndexPage.propTypes = {
   noteList: arrayOf(any),
+  onRemoveNote: func.isRequired,
 };
 
 IndexPage.defaultProps = {
@@ -65,10 +97,11 @@ const mapStateToProps = createStructuredSelector({
   noteList: homeData('noteConfig'),
 });
 
-// const mapDispatchToProps = {
-//   onStoreNote: storeNotes,
-// };
+const mapDispatchToProps = {
+  onRemoveNote: removeNote,
+};
+
 
 export default connect(
-  mapStateToProps,
+  mapStateToProps, mapDispatchToProps,
 )(IndexPage);
