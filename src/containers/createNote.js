@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState } from "react"
+import { navigate } from 'gatsby'
 // import { Link } from "gatsby"
 import { Modal, Button, Input, Row, Col, Select } from 'antd'
 import { connect } from 'react-redux';
@@ -51,6 +52,7 @@ const CreateNote = ({ onStoreNote, onSaveNote, notes, location }) => {
     if (!noteID) {
       return onStoreNote(tempNotes);
     };
+    navigate('/');
     return onSaveNote(tempNotes)
   };
   

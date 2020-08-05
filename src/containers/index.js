@@ -19,9 +19,9 @@ const IndexPage = ({ noteList }) => {
       <div style={{ display: 'flex' }}>
         {isEmpty(noteList) && <h2>Notes is empty ...</h2>}
         {noteList && noteList.map(({ id }) => (
-          <div style={{ margin: 10 }}>
+          <div key={id} style={{ margin: 10 }}>
             <Link to={`/notes/?id=${id}`}>
-              <Card />
+              <Card noteID={id} />
             </Link>
           </div>
         ))}
@@ -41,16 +41,14 @@ const IndexPage = ({ noteList }) => {
         </Link>
       </div>
 
-      <Link to={`/notes/1`}>
-        <div style={{
-            marginTop: 100,
-            textAlign: 'right',
-            cursor: 'pointer',
-          }}
-        >
-          <span>Edit</span>
-        </div>
-      </Link>
+      <div style={{
+          marginTop: 100,
+          textAlign: 'right',
+          cursor: 'pointer',
+        }}
+      >
+        <span>Edit</span>
+      </div>
     </Layout>
   )
 }

@@ -6,6 +6,7 @@ import {
   LOAD_EXAMPLES_DATA_ERROR,
   STORE_NOTES,
   SAVE_NOTES,
+  REMOVE_NOTE,
 } from "./constant"
 
 const initialState = fromJS({
@@ -35,6 +36,13 @@ export default (state = initialState, action) => {
         },
       ];
       return state.set('noteConfig', notes);
+    }
+
+    case REMOVE_NOTE: {
+      const noteID = action.payload;
+      const currentNotes = state.get('noteConfig');
+      const removeSelectedNote = currentNotes.filter((note => note.id !== noteID));
+      return state.set('noteConfig', removeSelectedNote);
     }
 
     case LOAD_EXAMPLES_DATA:

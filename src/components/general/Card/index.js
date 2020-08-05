@@ -1,7 +1,17 @@
-import React, { useEffect } from "react";
-import { node, bool } from "prop-types";
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+import React from "react";
+import { node, bool, func } from "prop-types";
+import { connect } from 'react-redux';
 
-const Card = ({ children, removeable }) => {
+import { removeNote } from "../../../redux/Home/action";
+
+const Card = ({ children, removeable, onRemoveNote, noteID }) => {
+  const removeAction = id => {
+    console.log('remove func')
+    onRemoveNote(id);
+  };
+
   return (
     <div
       style={{
@@ -25,6 +35,7 @@ const Card = ({ children, removeable }) => {
             borderRadius: '50px',
             width: '25px',
           }}
+          onClick={() => removeAction(noteID)}
         >
           X
         </div>}
@@ -36,6 +47,7 @@ const Card = ({ children, removeable }) => {
 Card.propTypes = {
   children: node,
   removeable: bool,
+  onRemoveNote: func.isRequired,
 };
 
 Card.defaultProps = {
@@ -43,4 +55,24 @@ Card.defaultProps = {
   removeable: true,
 };
 
-export default Card;
+// const mapStateToProps = createStructuredSelector({
+//   notes: homeData('noteConfig'),
+// });
+
+const mapDispatchToProps = {
+  onRemoveNote: removeNote,
+};
+
+// CreateNote.propTypes = {
+//   notes: arrayOf(any),
+//   onStoreNote: func.isRequired,
+//   onSaveNote: func.isRequired,
+// };
+
+// CreateNote.defaultProps = {
+//   notes: [],
+// };
+
+export default connect(
+  null, mapDispatchToProps,
+)(Card);
