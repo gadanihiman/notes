@@ -1,11 +1,12 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState } from "react"
-import { Link } from "gatsby"
+// import { Link } from "gatsby"
 import { Modal, Button, Input, Row, Col, Select } from 'antd'
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { arrayOf, any, func } from "prop-types";
+import { v4 as uuidv4 } from 'uuid';
 
 import Layout from "../components/Layout/layout"
 import SEO from "../components/Layout/seo"
@@ -19,15 +20,43 @@ const CreateNote = ({ onStoreNote, notes }) => {
   const [position, setPosition] = useState('');
   const [color, setColor] = useState('');
   const [text, setText] = useState('');
+  const [tempNotes, setTempNotes] = useState([]);
   const handleColorChange = value => {
     setColor(value);
   };
-  const saveNote = config => {
-    onStoreNote(config);
-    setVisible(false)
-  };
 
-  const noteFiltered = notes.sort((a, b) => {
+  // structure data
+  // [
+  //   {
+  //     id: 'asd',
+  //     notes: [
+  //       {
+  //         id: 'asd',
+  //         ...config,
+  //       }
+  //     ],
+  //   }
+  // ]
+
+  const createTempNote = config => {
+    const tempNoteToStore = tempNotes;
+    const noteConfig = {
+      id: uuidv4(),
+      ...config,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+    }
+    tempNoteToStore.push(noteConfig);
+    setTempNotes(tempNoteToStore);
+    setVisible(false);
+  };
+  
+  const saveNotes = note => {
+    onStoreNote(note);
+  };
+  
+
+  const noteFiltered = tempNotes && tempNotes.sort((a, b) => {
     const positionA = +a.position;
     const positionB = +b.position;
   
@@ -100,7 +129,7 @@ const CreateNote = ({ onStoreNote, notes }) => {
         <Modal
           title="New Note"
           visible={isVisible}
-          onOk={() => saveNote({ position, color, text })}
+          onOk={() => createTempNote({ position, color, text })}
           onCancel={() => setVisible(false)}
         >
           <Row>
@@ -143,6 +172,16 @@ const CreateNote = ({ onStoreNote, notes }) => {
             </Col>
           </Row>
         </Modal>
+      </div>
+      <div style={{ width: '90%', margin: '30px auto' }}>
+        <Button
+          type="primary"
+          size="large"
+          block
+          onClick={() => saveNotes(tempNotes)}
+        >
+          Save
+        </Button>
       </div>
     </Layout>
   );
